@@ -1,0 +1,30 @@
+/* dark.qss */
+QMainWindow {
+    background-color: #2e2e2e;
+}
+
+QLineEdit {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 24px;
+}
+
+QPushButton {
+    background-color: #444444;
+    color: #ffffff;
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 20px;
+}
+
+QPushButton:hover {
+    background-color: #555555;
+}
+
+QPushButton:pressed {
+    background-color: #666666;
+}
