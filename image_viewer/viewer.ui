@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ImageViewer</class>
  <widget class="QWidget" name="ImageViewer">
@@ -18,8 +19,8 @@
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
-     <widget class="QWidget" name="scroll_content">
-      <layout class="QVBoxLayout" name="scroll_layout">
+     <widget class="QWidget" name="scroll_area_widget">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QLabel" name="label_image">
          <property name="minimumSize">
@@ -30,9 +31,6 @@
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
-         </property>
-         <property name="objectName">
-          <string>label_image</string>
          </property>
         </widget>
        </item>
@@ -50,16 +48,16 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_zoom_in">
+      <widget class="QPushButton" name="btn_fit">
        <property name="text">
-        <string>Zoom +</string>
+        <string>Fit</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_zoom_out">
+      <widget class="QPushButton" name="btn_one_to_one">
        <property name="text">
-        <string>Zoom -</string>
+        <string>1:1</string>
        </property>
       </widget>
      </item>

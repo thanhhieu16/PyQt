@@ -19,19 +19,16 @@ class ImageViewer(QtWidgets.QWidget):
                 self.setStyleSheet(f.read())
 
         self.ui.btn_open.clicked.connect(self.open_image)
-        self.ui.btn_zoom_in.clicked.connect(self.zoom_in)
-        self.ui.btn_zoom_out.clicked.connect(self.zoom_out)
         self.ui.btn_rotate_left.clicked.connect(self.rotate_left)
         self.ui.btn_rotate_right.clicked.connect(self.rotate_right)
+        self.ui.btn_fit.clicked.connect(self.fit_image)
+        self.ui.btn_one_to_one.clicked.connect(self.one_to_one)
 
-        # Zoom state
         self.scale_factor = 1.0
         self.rotation = 0
+        self.original_pixmap = None
 
-        # Lắng nghe sự kiện lăn chuột trên label
         self.ui.label_image.installEventFilter(self)
-
-        # Cho phép kéo-thả file vào cửa sổ
         self.setAcceptDrops(True)
 
     def open_image(self):
@@ -44,32 +41,25 @@ class ImageViewer(QtWidgets.QWidget):
             self.original_pixmap = QtGui.QPixmap(file_path)
             self.scale_factor = 1.0
             self.rotation = 0
-            self.update_image_display()
+            self.fit_image()
 
     def update_image_display(self):
-        if hasattr(self, "original_pixmap"):
+        if self.original_pixmap:
             pixmap = self.original_pixmap
 
-            # Xoay
+            # Xoay ảnh
             transform = QtGui.QTransform().rotate(self.rotation)
-            pixmap = pixmap.transformed(transform, QtCore.Qt.SmoothTransformation)
+            rotated_pixmap = pixmap.transformed(transform, QtCore.Qt.SmoothTransformation)
 
-            # Zoom
-            scaled = pixmap.scaled(
-                pixmap.size() * self.scale_factor,
+            # Zoom ảnh
+            scaled = rotated_pixmap.scaled(
+                rotated_pixmap.size() * self.scale_factor,
                 QtCore.Qt.KeepAspectRatio,
                 QtCore.Qt.SmoothTransformation
             )
 
             self.ui.label_image.setPixmap(scaled)
-
-    def zoom_in(self):
-        self.scale_factor *= 1.1
-        self.update_image_display()
-
-    def zoom_out(self):
-        self.scale_factor /= 1.1
-        self.update_image_display()
+            self.ui.label_image.adjustSize()
 
     def rotate_left(self):
         self.rotation -= 90
@@ -79,17 +69,36 @@ class ImageViewer(QtWidgets.QWidget):
         self.rotation += 90
         self.update_image_display()
 
+    def fit_image(self):
+        if self.original_pixmap:
+            scroll_area_size = self.ui.scroll_area.viewport().size()
+            pixmap = self.original_pixmap
+
+            transform = QtGui.QTransform().rotate(self.rotation)
+            rotated_pixmap = pixmap.transformed(transform, QtCore.Qt.SmoothTransformation)
+
+            ratio = min(
+                scroll_area_size.width() / rotated_pixmap.width(),
+                scroll_area_size.height() / rotated_pixmap.height()
+            )
+            self.scale_factor = ratio
+            self.update_image_display()
+
+    def one_to_one(self):
+        self.scale_factor = 1.0
+        self.update_image_display()
+
     def eventFilter(self, source, event):
         if source == self.ui.label_image and event.type() == QtCore.QEvent.Wheel:
             delta = event.angleDelta().y()
             if delta > 0:
-                self.zoom_in()
+                self.scale_factor *= 1.1
             else:
-                self.zoom_out()
+                self.scale_factor /= 1.1
+            self.update_image_display()
             return True
         return super().eventFilter(source, event)
 
-    # Kéo - Thả ảnh
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
